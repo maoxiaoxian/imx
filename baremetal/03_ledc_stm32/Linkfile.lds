@@ -1,0 +1,13 @@
+SECTIONS {
+    . = 0x87800000;
+    .text : {
+        start.o
+        *(.text)
+    }
+    .rodata ALIGN(4) : {*(.rodata*)}
+    .data ALIGN(4) : {*(.data)}
+    . = ALIGN(4);
+    _bss_start = . ;
+    .bss ALIGN(4) : {*(.bss) *(COMMON)}
+    _bss_end = . ;
+}
