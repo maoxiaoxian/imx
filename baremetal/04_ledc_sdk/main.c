@@ -1,24 +1,24 @@
 #include "fsl_common.h"
 #include "fsl_iomuxc.h"
-#include "MCIMX6Y2.h"
+#include "mcimx6y2.h"
 
 // CCM_CCGR 寄存器复位值
-// #define CCGR_RST_VAL 0xFFFFFFFF
+#define CCGR_RST_VAL 0xFFFFFFFF
 
 // 使能所有时钟
 void clock_enable(void)
 {
-    CCM->CCGR0 = 0xFFFFFFFF;
-    CCM->CCGR1 = 0xFFFFFFFF;
-    CCM->CCGR2 = 0xFFFFFFFF;
-    CCM->CCGR3 = 0xFFFFFFFF;
-    CCM->CCGR4 = 0xFFFFFFFF;
-    CCM->CCGR5 = 0xFFFFFFFF;
-    CCM->CCGR6 = 0xFFFFFFFF;
+    CCM->CCGR0 = CCGR_RST_VAL;
+    CCM->CCGR1 = CCGR_RST_VAL;
+    CCM->CCGR2 = CCGR_RST_VAL;
+    CCM->CCGR3 = CCGR_RST_VAL;
+    CCM->CCGR4 = CCGR_RST_VAL;
+    CCM->CCGR5 = CCGR_RST_VAL;
+    CCM->CCGR6 = CCGR_RST_VAL;
 }
 
 // 初始化 LED 对应的 GPIO
-void led_init(void)
+static void led_init(void)
 {
     // 设置 GPIO1_IO03 功能复用，IO03 功能选择为通用 GPIO
     // IOMUXC_SetPinMux() 的最后一个参数为 inputOnfield，即寄存器对应的 SION 位
@@ -47,27 +47,29 @@ void led_init(void)
 }
 
 // 打开 LED
-void led_on(void)
+static void led_on(void)
 {
     // GPIO1_DR 寄存器的 bit3 置 0，打开 LED
     GPIO1->DR &= ~(1 << 3);
 }
 
 // 关闭 LED
-void led_off(void)
+static void led_off(void)
 {
     // GPIO1_DR 寄存器的 bit3 置 1，关闭 LED
     GPIO1->DR |= (1 << 3);
 }
 
 // CPU 执行空操作，实现短时间延时
-void delay_short(uint32_t tick)
+// 注意：这里的变量必须使用 volatile 修饰，不然会被编译器优化掉！
+static void delay_short(volatile uint32_t tick)
 {
     while (tick--) {}
 }
 
 // 延时函数，CPU 主频为 396MHz 时，执行一次耗时约 1ms
-void delay_ms(uint32_t ms)
+// 注意：这里的变量必须使用 volatile 修饰，不然会被编译器优化掉！
+static void delay_ms(volatile uint32_t ms)
 {
     while (ms--)
     {

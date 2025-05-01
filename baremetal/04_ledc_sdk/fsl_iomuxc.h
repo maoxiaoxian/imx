@@ -1,7 +1,7 @@
 #ifndef _FSL_IOMUXC_H_
 #define _FSL_IOMUXC_H_
 
-#include "MCIMX6Y2.h"
+#include "mcimx6y2.h"
 #include "fsl_common.h"
 
 /*!
