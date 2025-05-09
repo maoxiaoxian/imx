@@ -1,5 +1,5 @@
 CROSS_COMPILE ?= arm-linux-gnueabihf-
-TARGET ?= uart
+TARGET ?= printf
 
 CC := $(CROSS_COMPILE)gcc
 LD := $(CROSS_COMPILE)ld
@@ -14,6 +14,7 @@ OBJDUMP := $(CROSS_COMPILE)objdump
 LIBPATH := -lgcc -L /usr/local/arm/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/lib/gcc/arm-linux-gnueabihf/4.9.4
 
 INCDIRS := nxp \
+			stdio/include \
 			bsp/clk \
 			bsp/led \
 			bsp/delay \
@@ -27,6 +28,7 @@ INCDIRS := nxp \
 			bsp/uart
 
 SRCDIRS := project \
+			stdio/lib \
 			bsp/clk \
 			bsp/led \
 			bsp/delay \
@@ -83,8 +85,18 @@ $(SOBJS) : obj/%.o : %.S
 # 使用该参数后，用户就可以实现自己的类似 putc() 这样的函数
 	$(CC) -Wall -nostdlib -fno-builtin -c -O2 $(INCLUDE) -o $@ $<
 
+# -Wa 为一个 GCC 编译器选项，其作用是将跟在它后面的参数传递给汇编器
+# GCC 编译过程通常分为多个阶段，包括预处理、编译、汇编和链接。在汇编阶段
+# GCC 会调用汇编器（如 as）将汇编代码转换为目标文件
+# -Wa 选项允许用户向这个汇编器传递额外的参数
+# -mimplicit-it=thumb 为传递给汇编器的具体参数，其具体作用如下：
+# implicit-it：it 是 ARM 架构中用于条件执行的指令块（IF-THEN 块），
+# Thumb-2 指令集中的一些指令可以根据条件标志位决定是否执行，implicit-it 选项用于控制这些条件执行指令的隐式行为
+# -mimplicit-it=thumb 明确指定了汇编器在处理 Thumb 代码时对隐式 it 指令块的处理方式，
+# 启用这个选项后，汇编器会按照 Thumb 指令集的规则来隐式处理条件执行指令，
+# 也就是在合适的情况下自动插入 it 指令块，从而保证条件执行指令能正确工作
 $(COBJS) : obj/%.o : %.c
-	$(CC) -Wall -nostdlib -fno-builtin -c -O2 $(INCLUDE) -o $@ $<
+	$(CC) -Wall -Wa,-mimplicit-it=thumb -nostdlib -fno-builtin -c -O2 $(INCLUDE) -o $@ $<
 
 clean:
 	rm -rf $(TARGET).elf $(TARGET).dis $(TARGET).bin $(COBJS) $(SOBJS) load.imx
