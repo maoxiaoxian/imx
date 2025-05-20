@@ -12,6 +12,40 @@
 #define ATKVGA     0xFF00 // VGA 接口
 #define ATKUNKNOWN 0x0000
 
+/* 像素点大小 (单位为字节) */
+#define PIXEL_SIZE_ARGB8888 4
+
+/* LCD 显存首地址 */
+#define LCD_FRAMEBUF_ADDR (0x89000000)
+
+/* 屏幕颜色定义 */
+#define LCD_BLUE          0x000000FF
+#define LCD_GREEN         0x0000FF00
+#define LCD_RED           0x00FF0000
+#define LCD_CYAN          0x0000FFFF
+#define LCD_MAGENTA       0x00FF00FF
+#define LCD_YELLOW        0x00FFFF00
+#define LCD_LIGHTBLUE     0x008080FF
+#define LCD_LIGHTGREEN    0x0080FF80
+#define LCD_LIGHTRED      0x00FF8080
+#define LCD_LIGHTCYAN     0x0080FFFF
+#define LCD_LIGHTMAGENTA  0x00FF80FF
+#define LCD_LIGHTYELLOW   0x00FFFF80
+#define LCD_DARKBLUE      0x00000080
+#define LCD_DARKGREEN     0x00008000
+#define LCD_DARKRED       0x00800000
+#define LCD_DARKCYAN      0x00008080
+#define LCD_DARKMAGENTA   0x00800080
+#define LCD_DARKYELLOW    0x00808000
+#define LCD_WHITE         0x00FFFFFF
+#define LCD_LIGHTGRAY     0x00D3D3D3
+#define LCD_GRAY          0x00808080
+#define LCD_DARKGRAY      0x00404040
+#define LCD_BLACK         0x00000000
+#define LCD_BROWN         0x00A52A2A
+#define LCD_ORANGE        0x00FFA500
+#define LCD_TRANSPARENT   0x00000000
+
 /*
  * LCD 屏幕 ID
  * 三个模拟开关的值 Mx 与 Panel ID 的对应关系如下：
@@ -41,21 +75,24 @@ typedef struct tft_lcd_t{
 
     // VSPW, VBP, VFP
     uint16_t vspw;
-    uint16_t vbpd;
-    uint16_t vfpd;
+    uint16_t vbp;
+    uint16_t vfp;
 
     // HSPW, HBF, HFP
     uint16_t hspw;
-    uint16_t hbpd;
-    uint16_t hfpd;
+    uint16_t hbp;
+    uint16_t hfp;
 
-    uint32_t framebuffer; // 显存起始地址
+    uint32_t buf; // 显存起始地址
 
     uint32_t forecolor; // 屏幕前景色
     uint32_t backcolor; // 屏幕背景色
 
-    uint32_t id; // 屏幕 ID
+    uint16_t id; // 屏幕 ID
 } tft_lcd_t;
+
+/* 屏幕参数 */
+extern tft_lcd_t tft_lcd;
 
 /* 函数定义 */
 void lcd_init(void);
@@ -69,5 +106,13 @@ void lcd_panel_id_gpio_init(void);
 uint16_t lcd_read_panel_id(void);
 
 void lcd_gpio_init(void);
+
+void lcd_clk_init(uint8_t loop_div, uint8_t pre_div, uint8_t post_div);
+
+/* 画图 API */
+inline void lcd_draw_point(uint16_t x, uint16_t y, uint32_t color);
+inline uint32_t lcd_read_point(uint16_t x, uint16_t y);
+void lcd_draw_rtg(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint32_t color);
+void lcd_clear(uint32_t color);
 
 #endif /* _LCD_H */
