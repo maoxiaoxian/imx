@@ -108,7 +108,7 @@ $(SOBJS) : obj/%.o : %.S
 # 启用这个选项后，汇编器会按照 Thumb 指令集的规则来隐式处理条件执行指令，
 # 也就是在合适的情况下自动插入 it 指令块，从而保证条件执行指令能正确工作
 $(COBJS) : obj/%.o : %.c
-	$(CC) -Wall -Wa,-mimplicit-it=thumb -nostdlib -fno-builtin -c -O2 $(INCLUDE) -o $@ $<
+	$(CC) -Wall -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -Wa,-mimplicit-it=thumb -nostdlib -fno-builtin -c -O2  $(INCLUDE) -o $@ $<
 
 clean:
 	rm -rf $(TARGET).elf $(TARGET).dis $(TARGET).bin $(COBJS) $(SOBJS) load.imx

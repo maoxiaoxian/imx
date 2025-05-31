@@ -3,17 +3,12 @@
 #include "beep.h"
 #include "key.h"
 #include "gpio.h"
-#include "exit.h"
 #include "int.h"
-#include "epit.h"
-#include "key_filter.h"
 #include "delay.h"
 #include "uart.h"
 #include "stdio.h"
 #include "lcd.h"
 #include "lcdapi.h"
-#include "rtc.h"
-#include "ap3216c.h"
 #include "spi.h"
 #include "icm20608.h"
 
@@ -100,6 +95,7 @@ int main(void)
 {
     static uint8_t led_state = ACT_OFF;
 
+    imx6ul_hardfpu_enable(); /* 使能硬件浮点运算 */
     int_init();     // 中断初始化
     clock_init();   // 初始化 PLL
     delay_init();   // 初始化延迟
@@ -142,8 +138,11 @@ int main(void)
 
     tft_lcd.forecolor = LCD_BLUE;
 
+    // printf("Ready to Read Data!\r\n");
+
     while (1)
     {
+        // printf("Enter while(1)\r\n");
         icm20608_get_data();
 
         integer_display(50 + 70, 130, 16, icm20608_dev.accel_x_adc);

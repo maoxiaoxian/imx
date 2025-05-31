@@ -119,5 +119,7 @@ uint8_t icm20608_read_reg(uint8_t reg);
 void icm20608_read_len(uint8_t reg, uint8_t *buf, uint8_t len);
 
 void icm20608_get_data(void);
+float icm20608_gyro_scaleget(void);
+uint16_t icm20608_accel_scaleget(void);
 
 #endif /* _ICM20608_H */

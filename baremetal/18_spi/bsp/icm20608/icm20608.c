@@ -218,6 +218,8 @@ void icm20608_get_data(void)
     unsigned short accescale;
     unsigned char data[14];
 
+    // printf("[icm20608_get_data]: Ready to Read Data!\r\n");
+
     icm20608_read_len(ICM20_ACCEL_XOUT_H, data, 14);
 
     gyroscale = icm20608_gyro_scaleget();
