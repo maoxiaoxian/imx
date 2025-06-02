@@ -11,6 +11,7 @@
 #include "lcdapi.h"
 #include "spi.h"
 #include "icm20608.h"
+#include "gt9147.h"
 
 /*
  * @description  : 在屏幕指定的位置显示整数
@@ -94,6 +95,7 @@ void imx6ul_hardfpu_enable(void)
 int main(void)
 {
     static uint8_t led_state = ACT_OFF;
+    unsigned char i = 0;
 
     imx6ul_hardfpu_enable(); /* 使能硬件浮点运算 */
     int_init();     // 中断初始化
@@ -108,62 +110,46 @@ int main(void)
     // rtc_init();     // 初始化 RTC
 
     tft_lcd.forecolor = LCD_RED;
-    lcd_show_string(30, 10, 400, 24, 24, (char *)"ALPHA-IMX6UL SPI TEST"); /* 显示字符串 */
+    lcd_show_string(30, 10, 400, 24, 24, (char *)"ALPHA-IMX6UL Touch TEST"); /* 显示字符串 */
 
-    while (icm20608_init()) /* 初始化 ICM20608 */
-    {
-        lcd_show_string(50, 100, 200, 16, 16, (char*)"ICM20608 Check Failed!");
-        delay_ms(500);
-        lcd_show_string(50, 100, 200, 16, 16, (char*)"Please Check!        ");
-        delay_ms(500);
-    }
+    /* 初始化触摸屏 */
+    gt9147_init();
 
-    lcd_show_string(50, 100, 200, 16, 16, (char*)"ICM20608 Ready");
-
-    lcd_show_string(50, 130, 200, 16, 16, (char*)"accel x:");
-    lcd_show_string(50, 150, 200, 16, 16, (char*)"accel y:");
-    lcd_show_string(50, 170, 200, 16, 16, (char*)"accel z:");
-    lcd_show_string(50, 190, 200, 16, 16, (char*)"gyro  x:");
-    lcd_show_string(50, 210, 200, 16, 16, (char*)"gyro  y:");
-    lcd_show_string(50, 230, 200, 16, 16, (char*)"gyro  z:");
-    lcd_show_string(50, 250, 200, 16, 16, (char*)"temp   :");
-
-    lcd_show_string(50 + 181, 130, 200, 16, 16, (char*)"g");
-    lcd_show_string(50 + 181, 150, 200, 16, 16, (char*)"g");
-    lcd_show_string(50 + 181, 170, 200, 16, 16, (char*)"g");
-    lcd_show_string(50 + 181, 190, 200, 16, 16, (char*)"o/s");
-    lcd_show_string(50 + 181, 210, 200, 16, 16, (char*)"o/s");
-    lcd_show_string(50 + 181, 230, 200, 16, 16, (char*)"o/s");
-    lcd_show_string(50 + 181, 250, 200, 16, 16, (char*)"C");
-
+    lcd_show_string(50, 40,  400, 16, 16, (char*)"TP Num:");
+    lcd_show_string(50, 60,  200, 16, 16, (char*)"Point0 X:");
+    lcd_show_string(50, 80,  200, 16, 16, (char*)"Point0 Y:");
+    lcd_show_string(50, 100, 200, 16, 16, (char*)"Point1 X:");
+    lcd_show_string(50, 120, 200, 16, 16, (char*)"Point1 Y:");
+    lcd_show_string(50, 140, 200, 16, 16, (char*)"Point2 X:");
+    lcd_show_string(50, 160, 200, 16, 16, (char*)"Point2 Y:");
+    lcd_show_string(50, 180, 200, 16, 16, (char*)"Point3 X:");
+    lcd_show_string(50, 200, 200, 16, 16, (char*)"Point3 Y:");
+    lcd_show_string(50, 220, 200, 16, 16, (char*)"Point4 X:");
+    lcd_show_string(50, 240, 200, 16, 16, (char*)"Point4 Y:");
     tft_lcd.forecolor = LCD_BLUE;
-
-    // printf("Ready to Read Data!\r\n");
 
     while (1)
     {
-        // printf("Enter while(1)\r\n");
-        icm20608_get_data();
+        lcd_show_num(50 + 72, 40,  gt9147_dev.point_num, 1, 16);
+        lcd_show_num(50 + 72, 60,  gt9147_dev.x[0], 5, 16);
+        lcd_show_num(50 + 72, 80,  gt9147_dev.y[0], 5, 16);
+        lcd_show_num(50 + 72, 100, gt9147_dev.x[1], 5, 16);
+        lcd_show_num(50 + 72, 120, gt9147_dev.y[1], 5, 16);
+        lcd_show_num(50 + 72, 140, gt9147_dev.x[2], 5, 16);
+        lcd_show_num(50 + 72, 160, gt9147_dev.y[2], 5, 16);
+        lcd_show_num(50 + 72, 180, gt9147_dev.x[3], 5, 16);
+        lcd_show_num(50 + 72, 200, gt9147_dev.y[3], 5, 16);
+        lcd_show_num(50 + 72, 220, gt9147_dev.x[4], 5, 16);
+        lcd_show_num(50 + 72, 240, gt9147_dev.y[4], 5, 16);
 
-        integer_display(50 + 70, 130, 16, icm20608_dev.accel_x_adc);
-        integer_display(50 + 70, 150, 16, icm20608_dev.accel_y_adc);
-        integer_display(50 + 70, 170, 16, icm20608_dev.accel_z_adc);
-        integer_display(50 + 70, 190, 16, icm20608_dev.gyro_x_adc);
-        integer_display(50 + 70, 210, 16, icm20608_dev.gyro_y_adc);
-        integer_display(50 + 70, 230, 16, icm20608_dev.gyro_z_adc);
-        integer_display(50 + 70, 250, 16, icm20608_dev.temp_adc);
+        delay_ms(10);
+        i++;
 
-        decimals_display(50 + 70 + 50, 130, 16, icm20608_dev.accel_x_act);
-        decimals_display(50 + 70 + 50, 150, 16, icm20608_dev.accel_y_act);
-        decimals_display(50 + 70 + 50, 170, 16, icm20608_dev.accel_z_act);
-        decimals_display(50 + 70 + 50, 190, 16, icm20608_dev.gyro_x_act);
-        decimals_display(50 + 70 + 50, 210, 16, icm20608_dev.gyro_y_act);
-        decimals_display(50 + 70 + 50, 230, 16, icm20608_dev.gyro_z_act);
-        decimals_display(50 + 70 + 50, 250, 16, icm20608_dev.temp_act);
-
-        delay_ms(120);
-        led_state = !led_state;
-        led_switch(LED0, led_state);
+        if (i == 50) {
+            i = 0;
+            led_state = !led_state;
+            led_switch(LED0, led_state);
+        }
     }
 
     return 0;
