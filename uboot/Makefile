@@ -246,6 +246,11 @@ ifeq ($(HOSTARCH),$(ARCH))
 CROSS_COMPILE ?=
 endif
 
+# maoxian add start: compilation options simplify
+ARCH = arm
+CROSS_COMPILE = arm-linux-gnueabihf-
+# maoxian add end
+
 KCONFIG_CONFIG	?= .config
 export KCONFIG_CONFIG
 
